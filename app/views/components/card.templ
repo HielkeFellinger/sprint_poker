@@ -1,0 +1,62 @@
+package components
+
+
+import (
+    "hielkefellinger.nl/sprint_poker/app/models"
+)
+
+templ Card(card models.Card, room models.Room) {
+    <div class="border border-zinc-200 border-2 shadow-md rounded-lg m-2 bg-white hover:bg-zinc-200 max-w-24 cursor-pointer"
+        title={ "Card: " + card.Id } id={ "card_" + card.Id } ws-send >
+        <div class="w-full flex items-center justify-between">
+            <div class="size-9 flex items-center justify-center">♥️</div>
+            <div class="size-9"> </div>
+            <div class="size-9 flex items-center justify-center">♥️</div>
+        </div>
+        <div class="w-full flex justify-center items-center flex-grow">
+            <div class="text-3xl font-bold">{ card.Value }</div>
+        </div>
+        <div class="w-full flex items-center justify-between">
+            <div class="size-10 flex items-center justify-center rotate-180">♥️</div>
+            <div class="size-10"> </div>
+            <div class="size-10 flex items-center justify-center rotate-180">♥️</div>
+        </div>
+    </div>
+}
+
+templ CardSmall(card models.Card, room models.Room) {
+    <div class="border border-zinc-200 border-2 shadow-md rounded-lg p-1 m-1 bg-white hover:bg-zinc-200 w-16"
+        title={ "Card: " + card.Id } >
+        <div class="w-full flex items-center justify-between">
+            <div class="text-xs flex items-center justify-center">♥️</div>
+            <div class="text-xs"></div>
+            <div class="text-xs flex items-center justify-center">♥️</div>
+        </div>
+        <div class="w-full flex justify-center items-center flex-grow">
+            <div class="text-xl font-bold">{ card.Value }</div>
+        </div>
+        <div class="w-full flex items-center justify-between">
+            <div class="text-xs flex items-center justify-center rotate-180">♥️</div>
+            <div class="text-xs"></div>
+            <div class="text-xs flex items-center justify-center rotate-180">♥️</div>
+        </div>
+    </div>
+}
+
+templ CardSmallHidden() {
+    <div class="border border-zinc-200 border-2 shadow-md rounded-lg p-1 m-1 bg-zinc-200 w-16">
+        <div class="w-full flex items-center justify-between">
+            <div class="text-xs flex items-center justify-center">❓</div>
+            <div class="text-xs"></div>
+            <div class="text-xs flex items-center justify-center">❓</div>
+        </div>
+        <div class="w-full flex justify-center items-center flex-grow">
+            <div class="text-xl font-bold">❓</div>
+        </div>
+        <div class="w-full flex items-center justify-between">
+            <div class="text-xs flex items-center justify-center rotate-180">❓</div>
+            <div class="text-xs"></div>
+            <div class="text-xs flex items-center justify-center rotate-180">❓</div>
+        </div>
+    </div>
+}
