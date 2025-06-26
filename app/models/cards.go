@@ -9,7 +9,7 @@ type Card struct {
 
 func defaultCardSet() []Card {
 	return []Card{
-		{Order: 0, Id: "question mark", Value: "❓"},
+		{Order: 0, Id: "question_mark", Value: "❓"},
 		{Order: 1, Id: "drink", Value: "☕"},
 		{Order: 2, Id: "0", Value: "0"},
 		{Order: 3, Id: "0.5", Value: "0.5"},
