@@ -81,6 +81,20 @@ func IsUserIdAuthenticatedInRoomSession(userId string, roomId string) bool {
 	return false
 }
 
+func GetPublicRoomStateByRoomId(Id string) models.PublicRoomState {
+	prs := models.PublicRoomState{
+		CardsVisible: false,
+		UserGuesses:  make([]models.UserGuess, 0),
+	}
+
+	if rs := runningRoomPool.getRoomSessionById(Id); rs != nil {
+		prs.CardsVisible = rs.RoomSessionState.CardsVisible
+		prs.UserGuesses = rs.GetAllUserGuesses()
+	}
+
+	return prs
+}
+
 func IsRoomSessionRunning(Id string) bool {
 	return runningRoomPool.getRoomSessionById(Id) != nil
 }

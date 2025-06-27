@@ -1,33 +1,37 @@
 package session
 
 import (
+	"context"
+	"github.com/gorilla/websocket"
 	"hielkefellinger.nl/sprint_poker/app/models"
+	"hielkefellinger.nl/sprint_poker/app/views/components"
 	"log"
 	"slices"
 )
 
-type RoomSession interface {
-	GetId() string
-	GetLeaderId() string
-	GetRoom() models.Room
-	GetAllAuthorizedUserIds() []string
-	GetAllUserIds(filterOut ...string) []string
-	IsUserIdAuthenticatedInRoomSession(userId string) bool
-	UpdateUserAsAuthenticatedIfNotAdded(user models.User)
-	SetUserAlias(userId string, alias string)
-	GetUserAlias(userId string) string
+type roomSessionState struct {
+	CardsVisible  bool                         `json:"cards_visible"`
+	UserIdToGuess map[string]*models.UserGuess `json:"-"`
 }
+
+func newRoomSessionState() roomSessionState {
+	return roomSessionState{
+		CardsVisible:  false,
+		UserIdToGuess: make(map[string]*models.UserGuess),
+	}
+}
+
 type roomSession struct {
 	Id                   string
 	LeaderId             string
 	Register             chan *roomUser
 	Unregister           chan *roomUser
-	Events               chan string
+	Events               chan requestMessage
 	users                map[*roomUser]bool
-	AuthenticatedUserIds []string
+	authenticatedUserIds []string
 	UserIdToAlias        map[string]string
 	Room                 models.Room
-	RoomSessionState     models.RoomSessionState
+	RoomSessionState     roomSessionState
 }
 
 func initRoomSession(room models.Room) *roomSession {
@@ -36,12 +40,12 @@ func initRoomSession(room models.Room) *roomSession {
 		LeaderId:             room.LeadId,
 		Register:             make(chan *roomUser),
 		Unregister:           make(chan *roomUser),
-		Events:               make(chan string),
+		Events:               make(chan requestMessage),
 		users:                make(map[*roomUser]bool),
-		AuthenticatedUserIds: make([]string, 0),
+		authenticatedUserIds: make([]string, 0),
 		UserIdToAlias:        make(map[string]string),
 		Room:                 room,
-		RoomSessionState:     models.NewRoomSessionState(),
+		RoomSessionState:     newRoomSessionState(),
 	}
 	return rs
 }
@@ -54,15 +58,70 @@ func (rs *roomSession) Run() {
 			rs.users[user] = true
 
 			// Update Room Session State
+			rs.addUserGuessOfRoomUser(*user)
 
 		case user := <-rs.Unregister:
+			// Recover lead leaving; allow for reconnection
 			delete(rs.users, user)
 			delete(rs.UserIdToAlias, user.Id)
-			// TODO recover lead leaving; should you always re-authenticate?
-		case eventString := <-rs.Events:
-			log.Println(eventString)
+			delete(rs.RoomSessionState.UserIdToGuess, user.Id)
+		case requestMsg := <-rs.Events:
+
+			switch requestMsg.Type {
+			case Guess:
+				//
+			case ToggleCardVisibility:
+				//
+			case RefreshRound:
+				//
+			}
+
+			// Send the new User Guess Card Box to the users
+			for user, connected := range rs.users {
+				writer, err := user.Conn.NextWriter(websocket.TextMessage)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+				if connected {
+					// TODO Cleanup (Proof of concept)
+
+					ctx := context.Background()
+					log.Printf("Rendering Guess Box for user %s", user.Id)
+					renderErr := components.UsersGuessBox(rs.RoomSessionState.CardsVisible, models.User{Id: user.Id, Name: user.Name},
+						rs.GetAllUserGuesses()).Render(ctx, writer)
+
+					if renderErr != nil {
+						log.Println(renderErr)
+					}
+
+					writer.Close()
+				}
+			}
+
 		}
 	}
+}
+
+func (rs *roomSession) addUserGuessOfRoomUser(user roomUser) {
+	userGuess := &models.UserGuess{
+		User: &models.User{
+			Id:   user.Id,
+			Name: user.Name,
+		},
+		Card: nil,
+	}
+	rs.RoomSessionState.UserIdToGuess[user.Id] = userGuess
+}
+
+func (rs *roomSession) GetAllUserGuesses() []models.UserGuess {
+	guesses := make([]models.UserGuess, 0)
+	for _, userGuess := range rs.RoomSessionState.UserIdToGuess {
+		if userGuess != nil {
+			guesses = append(guesses, *userGuess)
+		}
+	}
+	return guesses
 }
 
 func (rs *roomSession) GetId() string {
@@ -82,18 +141,18 @@ func (rs *roomSession) SetUserAlias(userId string, alias string) {
 }
 
 func (rs *roomSession) GetAllAuthorizedUserIds() []string {
-	return rs.AuthenticatedUserIds
+	return rs.authenticatedUserIds
 }
 
 func (rs *roomSession) UpdateUserAsAuthenticatedIfNotAdded(user models.User) {
-	if !slices.Contains(rs.AuthenticatedUserIds, user.Id) {
-		rs.AuthenticatedUserIds = append(rs.AuthenticatedUserIds, user.Id)
+	if !slices.Contains(rs.authenticatedUserIds, user.Id) {
+		rs.authenticatedUserIds = append(rs.authenticatedUserIds, user.Id)
 	}
 	rs.SetUserAlias(user.Id, user.Name)
 }
 
 func (rs *roomSession) IsUserIdAuthenticatedInRoomSession(userId string) bool {
-	return slices.Contains(rs.AuthenticatedUserIds, userId)
+	return slices.Contains(rs.authenticatedUserIds, userId)
 }
 
 func (rs *roomSession) GetUserAlias(userId string) string {

@@ -142,26 +142,13 @@ func RoomJoin() gin.HandlerFunc {
 func RoomJoinPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		notifications := make([]models.Notification, 0)
-		rawRoom, hasRoom := c.Get("room")
+		room := c.MustGet("room").(models.Room)
 		user := c.MustGet("user").(models.User)
 
 		// Validate User
 		if _, uuidErr := helpers.ParseStringToUuid(user.Id); uuidErr != nil {
 			noUserErr := models.NewNotification(models.Error, "Current user has no valid ID; please refresh session")
 			notifications = append(notifications, noUserErr)
-		}
-
-		// Validate Room
-		if !hasRoom {
-			c.Set("notification", models.NewNotification(models.Error, "404 - Room does not exist"))
-			c.Redirect(http.StatusFound, "/")
-			return
-		}
-		room := rawRoom.(models.Room)
-		if !session.IsRoomSessionRunning(room.Id) {
-			c.Set("notification", models.NewNotification(models.Error, "404 - Room is currently not running"))
-			c.Redirect(http.StatusFound, "/")
-			return
 		}
 
 		// Validate Request
@@ -219,13 +206,6 @@ func RoomSession() gin.HandlerFunc {
 			notifications = append(notifications, noUserErr)
 		}
 
-		// Validate Room
-		if !session.IsRoomSessionRunning(room.Id) {
-			c.Set("notification", models.NewNotification(models.Error, "404 - Room is currently not running"))
-			c.Redirect(http.StatusFound, "/")
-			return
-		}
-
 		// Test if user is Authenticated
 		if !session.IsUserIdAuthenticatedInRoomSession(user.Id, room.Id) {
 			c.Set("notification", models.NewNotification(models.Error, "401 - Not Authenticated"))
@@ -233,7 +213,8 @@ func RoomSession() gin.HandlerFunc {
 			return
 		}
 
-		renderErr := render(c, http.StatusOK, views.RoomSession(room, notifications))
+		roomState := session.GetPublicRoomStateByRoomId(room.Id)
+		renderErr := render(c, http.StatusOK, views.RoomSession(user, roomState, room, notifications))
 		if renderErr != nil {
 			log.Println(renderErr)
 			return

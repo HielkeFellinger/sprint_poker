@@ -7,7 +7,7 @@ import (
 
 templ Card(card models.Card, room models.Room) {
     <div class="border border-zinc-200 border-2 shadow-md rounded-lg m-2 bg-white hover:bg-zinc-200 max-w-24 cursor-pointer"
-        title={ "Card: " + card.Id } id={ "card_" + card.Id } hx-vals='{"myVal": "My Value"}' ws-send >
+        title={ "Card: " + card.Value } id={ "card_" + card.Id } hx-vals='{"type": "guess"}' hx-target="#userGuessBox" ws-send >
         <div class="w-full flex items-center justify-between">
             <div class="size-9 flex items-center justify-center">♥️</div>
             <div class="size-9"> </div>
@@ -24,9 +24,9 @@ templ Card(card models.Card, room models.Room) {
     </div>
 }
 
-templ CardSmall(card models.Card, room models.Room) {
-    <div class="border border-zinc-200 border-2 shadow-md rounded-lg p-1 m-1 bg-white hover:bg-zinc-200 w-16"
-        title={ "Card: " + card.Id } >
+templ CardSmall(card models.Card) {
+    <div class="border border-zinc-200 border-2 shadow-md rounded-lg p-1 m-1 bg-white w-16"
+        title={ "Card: " + card.Value } >
         <div class="w-full flex items-center justify-between">
             <div class="text-xs flex items-center justify-center">♥️</div>
             <div class="text-xs"></div>

@@ -1,15 +1,10 @@
 package session
 
 import (
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
-	"math"
 )
-
-type RoomUser interface {
-	GetId() string
-	GetName() string
-}
 
 type roomUser struct {
 	Id      string
@@ -47,18 +42,27 @@ func (ru *roomUser) Read() {
 		}
 
 		// User input unsafe!
-		_, rawEvent, err := ru.Conn.ReadMessage()
-		if err != nil {
-			log.Println(err)
+		_, rawRequestMessage, readErr := ru.Conn.ReadMessage()
+		if readErr != nil {
+			log.Printf("Error: could not read request message of user: '%s'", ru.Id)
 			return
 		}
 
-		// TODO remove logging
-		maxLength := int(math.Min(float64(len(rawEvent)), 1024))
-		log.Println(string(rawEvent[0:maxLength]))
+		// Attempt to parse-message
+		var requestMsg requestMessage
+		marshalErr := json.Unmarshal(rawRequestMessage, &requestMsg)
+		if marshalErr != nil {
+			log.Println(string(rawRequestMessage))
+			log.Printf("Error: could not parse request message of user: '%s'", ru.Id)
+			log.Printf("    - Parse error: '%s'", marshalErr.Error())
+			return
+		}
+
+		// Enrich Info
+		requestMsg.UserId = ru.Id
 
 		if ru.Session != nil {
-			ru.Session.Events <- string(rawEvent)
+			ru.Session.Events <- requestMsg
 		}
 	}
 }

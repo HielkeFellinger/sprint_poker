@@ -1,17 +1,8 @@
 package models
 
-type RoomSessionState struct {
-	CardsVisible  bool                  `json:"cards_visible"`
-	UserIdToGuess map[string]*UserGuess `json:"-"`
-	Guesses       []UserGuess           `json:"guesses"`
-}
-
-func NewRoomSessionState() RoomSessionState {
-	return RoomSessionState{
-		CardsVisible:  false,
-		UserIdToGuess: make(map[string]*UserGuess),
-		Guesses:       make([]UserGuess, 0),
-	}
+type PublicRoomState struct {
+	CardsVisible bool        `json:"cardsvisible"`
+	UserGuesses  []UserGuess `json:"user_guesses"`
 }
 
 type UserGuess struct {
