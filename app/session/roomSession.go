@@ -27,6 +27,7 @@ type roomSession struct {
 	AuthenticatedUserIds []string
 	UserIdToAlias        map[string]string
 	Room                 models.Room
+	RoomSessionState     models.RoomSessionState
 }
 
 func initRoomSession(room models.Room) *roomSession {
@@ -40,19 +41,24 @@ func initRoomSession(room models.Room) *roomSession {
 		AuthenticatedUserIds: make([]string, 0),
 		UserIdToAlias:        make(map[string]string),
 		Room:                 room,
+		RoomSessionState:     models.NewRoomSessionState(),
 	}
 	return rs
 }
 
 func (rs *roomSession) Run() {
 	for {
+		// TODO; add way to remove empty sessions
 		select {
 		case user := <-rs.Register:
 			rs.users[user] = true
+
+			// Update Room Session State
+
 		case user := <-rs.Unregister:
 			delete(rs.users, user)
 			delete(rs.UserIdToAlias, user.Id)
-			// TODO recover lead leaving; should jou always re-authenticate?
+			// TODO recover lead leaving; should you always re-authenticate?
 		case eventString := <-rs.Events:
 			log.Println(eventString)
 		}

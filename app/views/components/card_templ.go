@@ -59,7 +59,7 @@ func Card(card models.Card, room models.Room) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" ws-send><div class=\"w-full flex items-center justify-between\"><div class=\"size-9 flex items-center justify-center\">♥️</div><div class=\"size-9\"></div><div class=\"size-9 flex items-center justify-center\">♥️</div></div><div class=\"w-full flex justify-center items-center flex-grow\"><div class=\"text-3xl font-bold\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-vals='{\"myVal\": \"My Value\"}' ws-send><div class=\"w-full flex items-center justify-between\"><div class=\"size-9 flex items-center justify-center\">♥️</div><div class=\"size-9\"></div><div class=\"size-9 flex items-center justify-center\">♥️</div></div><div class=\"w-full flex justify-center items-center flex-grow\"><div class=\"text-3xl font-bold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
