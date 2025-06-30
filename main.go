@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"hielkefellinger.nl/sprint_poker/app/config"
 	"hielkefellinger.nl/sprint_poker/app/initializers"
 	"hielkefellinger.nl/sprint_poker/app/routes"
 	"log"
-	"os"
 )
 
 var engine *gin.Engine
@@ -14,6 +14,7 @@ var engine *gin.Engine
 func init() {
 	log.Println("INIT: Starting Initialisation of Sprint-Poker")
 	initializers.LoadEnvVariables()
+	config.InitConfig()
 	log.Println("INIT: Done. Initialisation Finished")
 }
 
@@ -22,7 +23,7 @@ func main() {
 
 	// Serve Content
 	log.Println("MAIN: Starting Gin.Engine")
-	log.Fatal(engine.Run(fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))))
+	log.Fatal(engine.Run(fmt.Sprintf("%s:%s", config.CurrentConfig.Host, config.CurrentConfig.Port)))
 }
 
 func loadGinEngine() {

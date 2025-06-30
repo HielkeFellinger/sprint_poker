@@ -44,7 +44,7 @@ func (ru *roomUser) Read() {
 		// User input unsafe!
 		_, rawRequestMessage, readErr := ru.Conn.ReadMessage()
 		if readErr != nil {
-			log.Printf("Error: could not read request message of user: '%s'", ru.Id)
+			log.Printf("Error: could not read request message of user: '%s', message: '%s'", ru.Id, readErr.Error())
 			return
 		}
 

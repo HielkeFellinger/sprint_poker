@@ -27,15 +27,15 @@ func ServeSessionWS(c *gin.Context) {
 	// Room should be active and user should have joined
 	runningRoomSession := runningRoomPool.getRoomSessionById(room.Id)
 	if runningRoomSession == nil {
-		// TODO no creation allowed
+		c.Redirect(http.StatusFound, "/")
+		c.Abort()
 		return
 	}
 
 	// Upgrade Connection
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		// TODO connection upgrade failed!
-		log.Println(err)
+		log.Printf("Could not upgrade connection of user: '%s' , message: '%s'", user.Id, err.Error())
 		return
 	}
 
@@ -48,6 +48,7 @@ func ServeSessionWS(c *gin.Context) {
 	}
 	roomUsr.Conn.SetReadLimit(maxMessageSize)
 	runningRoomSession.Register <- roomUsr
-	roomUsr.Read()
+	// TODO Read / Write Pump in own routine + Ping Pong?
+	go roomUsr.Read()
 	log.Printf("Finished registering WS user: '%s' to room: '%s'", user.Id, room.Id)
 }

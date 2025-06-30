@@ -5,7 +5,7 @@ import (
 	"hielkefellinger.nl/sprint_poker/app/views/components"
 )
 
-templ RoomCreate(notifications []models.Notification) {
+templ RoomCreate(notifications []models.Notification, possibleInput models.CreateOrJoinRoomValues) {
     <!DOCTYPE html>
     <html lang="en">
         @components.Header()
@@ -20,14 +20,18 @@ templ RoomCreate(notifications []models.Notification) {
                     <section class="mt-6 px-4 py-4 w-96 bg-blue-50 rounded-lg">
                         <form method="post" action="/room/create">
                             <label for="displayName" class="text-gray-700 ml-1">Your Display Name: </label>
-                            <input type="text" id="displayName" name="displayName" class="w-full border rounded-lg p-2 mt-2" placeholder="Your Display Name" required />
+                            <input type="text" id="displayName" name="displayName" class="w-full border rounded-lg p-2 mt-2"
+                            placeholder="Your Display Name" required value={possibleInput.UserName} />
                             <hr class="mt-4 mb-2">
                             <label for="roomName" class="text-gray-700 ml-1">Room Name: </label>
-                            <input type="text" id="roomName" name="roomName" class="w-full border rounded-lg p-2 mt-2 mb-2" placeholder="Room Name" required />
+                            <input type="text" id="roomName" name="roomName" class="w-full border rounded-lg p-2 mt-2 mb-2"
+                            placeholder="Room Name" required value={possibleInput.RoomName} />
                             <label for="password" class="text-gray-700 ml-1">Room Password (Optional): </label>
-                            <input type="password" id="password" name="password" class="w-full border rounded-lg p-2 mt-2 mb-2" placeholder="Room Password" />
+                            <input type="password" id="password" name="password" class="w-full border rounded-lg p-2 mt-2 mb-2"
+                            placeholder="Room Password" />
                             <label for="passwordCheck" class="text-gray-700 ml-1">Confirm Room Password (Optional): </label>
-                            <input type="password" id="passwordCheck" name="passwordCheck" class="w-full border rounded-lg p-2 mt-2 mb-2" placeholder="Confirm Room Password" />
+                            <input type="password" id="passwordCheck" name="passwordCheck" class="w-full border rounded-lg p-2 mt-2 mb-2"
+                            placeholder="Confirm Room Password" />
                             <button class="mt-2 w-full px-2 h-10 rounded-lg text-white bg-blue-500"> CREATE </button>
                         </form>
                     </section>

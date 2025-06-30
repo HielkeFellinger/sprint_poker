@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"hielkefellinger.nl/sprint_poker/app/config"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -34,7 +34,7 @@ func SetSessionJWTCookie(content SessionCookieContent, c *gin.Context) error {
 		"ID":        content.ID,
 		"ExpiresAt": content.ExpiresAt,
 	})
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	tokenString, err := token.SignedString([]byte(config.CurrentConfig.JwtSecret))
 
 	if err == nil {
 		c.SetSameSite(http.SameSiteLaxMode)
@@ -55,7 +55,7 @@ func ParseSessionCookie(c *gin.Context) (SessionCookieContent, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return []byte(os.Getenv("JWT_SECRET")), nil
+			return []byte(config.CurrentConfig.JwtSecret), nil
 		})
 
 		// Send jwtErr if failure in parsing

@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"golang.org/x/crypto/bcrypt"
-	"os"
+	"hielkefellinger.nl/sprint_poker/app/config"
 	"strconv"
 )
 
@@ -15,7 +15,7 @@ func HashPassword(password string) ([]byte, error) {
 
 func getCryptoCost() int {
 	// Get env settings
-	envCost := os.Getenv("CRYPT_COST")
+	envCost := config.CurrentConfig.CryptCost
 
 	envIntCost, err := strconv.ParseInt(envCost, 10, 8)
 	if err != nil || int(envIntCost) < minCryptoCost {

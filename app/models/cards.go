@@ -21,6 +21,7 @@ func defaultCardSet() []Card {
 		{Order: 9, Id: "13", Value: "13"},
 		{Order: 10, Id: "20", Value: "20"},
 		{Order: 11, Id: "40", Value: "40"},
-		{Order: 12, Id: "infinity", Value: "∞"},
+		{Order: 12, Id: "100", Value: "100"},
+		{Order: 13, Id: "infinity", Value: "∞"},
 	}
 }

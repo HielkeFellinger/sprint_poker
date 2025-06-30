@@ -8,9 +8,6 @@ import (
 )
 
 func HandlePageRoutes(router *gin.Engine) {
-	// Pages
-	router.GET("/", pages.Homepage())
-
 	// Room Routes
 	roomRoutes := router.Group("/room")
 	{
@@ -24,6 +21,9 @@ func HandlePageRoutes(router *gin.Engine) {
 		roomRoutes.POST("/join/:room_id", middleware.EnsureUserAndRoomValuesAreSet, pages.RoomJoinPost())
 		// Session
 		roomRoutes.GET("/:room_id/session", middleware.EnsureUserAndRoomValuesAreSetAndUserIsAuthenticated, pages.RoomSession())
-		roomRoutes.GET("/:room_id/session/ws", middleware.EnsureUserAndRoomValuesAreSetAndUserIsAuthenticated, session.ServeSessionWS)
+		roomRoutes.GET("/:room_id/session/ws", middleware.EnsureUserAndRoomValuesAreSetAndUserIsAuthenticatedWs, session.ServeSessionWS)
 	}
+
+	// Pages
+	router.GET("/", pages.Homepage())
 }

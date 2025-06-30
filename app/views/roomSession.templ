@@ -18,12 +18,12 @@ templ RoomSession(user models.User, roomState models.PublicRoomState, room model
                     <div class="flex items-center gap-2 text-gray-500">
                         <label for="roomId">Room ID: </label>
                         <input type="text" id="roomId" name="roomId" class="border rounded-lg p-2" value={ room.Id } />
-                        <button class="px-2 h-10 rounded-lg text-white bg-blue-300" title="Copy Room Id to clipboard"> 📋 </button>
+                        <button class="px-2 h-10 rounded-lg text-white bg-blue-500" title="Copy Room Id to clipboard"> 📋 </button>
                     </div>
                 </nav>
                 <div class="mt-6 w-full flex justify-center items-center flex-col"
                     hx-ext="ws" ws-connect={ "/room/" + room.Id + "/session/ws" }>
-                    <h4><span id="status"></span> Room : '{ room.Name }'</h4>
+                    <h4 class="font-bold text-gray-700"><span id="status"></span> Room : '{ room.Name }'</h4>
                     if len(notifications) > 0 {
                         @components.Notifications(notifications)
                     }
@@ -32,10 +32,15 @@ templ RoomSession(user models.User, roomState models.PublicRoomState, room model
                             @components.Card(card, room)
                         }
                     </section>
+                    
                     <section class="mt-2 px-2 py-4 w-2xl">
                         <div class="mt-6 w-full flex justify-center items-center flex-row">
-                            <button class="px-2 mx-2 h-10 rounded-lg text-white bg-blue-300 font-bold" title="Copy Room Id to clipboard"> SHOW / HIDE </button>
-                            <button class="px-2 mx-2 h-10 rounded-lg text-white bg-blue-300 font-bold" title="Copy Room Id to clipboard"> NEW ROUND </button>
+                            <button class="px-2 mx-2 h-10 rounded-lg text-white bg-blue-500 font-bold" ws-send
+                                hx-vals='{"type": "toggle-card-visibility"}' hx-target="#userGuessBox" hx-trigger="click"
+                                title="Show or hide all Guesses"> TOGGLE SHOW / HIDE CARDS </button>
+                            <button class="px-2 mx-2 h-10 rounded-lg text-white bg-blue-500 font-bold" ws-send
+                                hx-vals='{"type": "refresh-round"}' hx-target="#userGuessBox" hx-trigger="click"
+                                title="Clear all current Guesses"> NEW ROUND </button>
                         </div>
                     </section>
                     @components.UsersGuessBox(roomState.CardsVisible, user, roomState.UserGuesses)
@@ -49,6 +54,14 @@ templ RoomSession(user models.User, roomState models.PublicRoomState, room model
         let socket;
         let elt;
 
+        document.body.addEventListener('htmx:wsConnecting', function (evt) {
+            console.log('connecting to server');
+            status.innerText = 'Connecting to ';
+            status.classList.remove('text-red-700')
+            status.classList.add('text-orange-700')
+            status.classList.remove('text-green-700')
+            status.setAttribute('data-status', 'connecting');
+        });
         document.body.addEventListener('htmx:wsOpen', function(evt) {
             console.log('connected');
 
@@ -56,15 +69,19 @@ templ RoomSession(user models.User, roomState models.PublicRoomState, room model
             elt = evt.detail.elt;
 
             status.innerText = 'Connected to ';
+            status.classList.remove('text-red-700')
+            status.classList.remove('text-orange-700')
+            status.classList.add('text-green-700')
             status.setAttribute('data-status', 'connected');
         });
-
         document.body.addEventListener('htmx:wsClose', function(evt) {
             console.log('disconnected');
-
             console.warn(evt.detail)
 
             status.innerText = 'Disconnected from ';
+            status.classList.add('text-red-700')
+            status.classList.remove('text-orange-700')
+            status.classList.remove('text-green-700')
             status.setAttribute('data-status', 'disconnected');
         });
 

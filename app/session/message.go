@@ -25,11 +25,3 @@ type requestHxHeaders struct {
 	HxTarget      string `json:"HX-Target"`
 	HxCurrentUrl  string `json:"HX-Current-URL"`
 }
-
-func newReceiveMessage(UserId string, Type MessageType) requestMessage {
-	return requestMessage{
-		UserId:  UserId,
-		Type:    Type,
-		Headers: requestHxHeaders{},
-	}
-}

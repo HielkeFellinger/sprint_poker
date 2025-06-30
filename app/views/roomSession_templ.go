@@ -55,7 +55,7 @@ func RoomSession(user models.User, roomState models.PublicRoomState, room models
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <button class=\"px-2 h-10 rounded-lg text-white bg-blue-300\" title=\"Copy Room Id to clipboard\">📋 </button></div></nav><div class=\"mt-6 w-full flex justify-center items-center flex-col\" hx-ext=\"ws\" ws-connect=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <button class=\"px-2 h-10 rounded-lg text-white bg-blue-500\" title=\"Copy Room Id to clipboard\">📋 </button></div></nav><div class=\"mt-6 w-full flex justify-center items-center flex-col\" hx-ext=\"ws\" ws-connect=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -68,14 +68,14 @@ func RoomSession(user models.User, roomState models.PublicRoomState, room models
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><h4><span id=\"status\"></span> Room : '")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><h4 class=\"font-bold text-gray-700\"><span id=\"status\"></span> Room : '")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(room.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/views/roomSession.templ`, Line: 26, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/views/roomSession.templ`, Line: 26, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -101,7 +101,7 @@ func RoomSession(user models.User, roomState models.PublicRoomState, room models
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</section><section class=\"mt-2 px-2 py-4 w-2xl\"><div class=\"mt-6 w-full flex justify-center items-center flex-row\"><button class=\"px-2 mx-2 h-10 rounded-lg text-white bg-blue-300 font-bold\" title=\"Copy Room Id to clipboard\">SHOW / HIDE </button> <button class=\"px-2 mx-2 h-10 rounded-lg text-white bg-blue-300 font-bold\" title=\"Copy Room Id to clipboard\">NEW ROUND </button></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</section><section class=\"mt-2 px-2 py-4 w-2xl\"><div class=\"mt-6 w-full flex justify-center items-center flex-row\"><button class=\"px-2 mx-2 h-10 rounded-lg text-white bg-blue-500 font-bold\" ws-send hx-vals='{\"type\": \"toggle-card-visibility\"}' hx-target=\"#userGuessBox\" hx-trigger=\"click\" title=\"Show or hide all Guesses\">TOGGLE SHOW / HIDE CARDS </button> <button class=\"px-2 mx-2 h-10 rounded-lg text-white bg-blue-500 font-bold\" ws-send hx-vals='{\"type\": \"refresh-round\"}' hx-target=\"#userGuessBox\" hx-trigger=\"click\" title=\"Clear all current Guesses\">NEW ROUND </button></div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -109,7 +109,7 @@ func RoomSession(user models.User, roomState models.PublicRoomState, room models
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></main></body></html><script type=\"text/javascript\" defer>\n        let status = document.getElementById('status');\n\n        let socket;\n        let elt;\n\n        document.body.addEventListener('htmx:wsOpen', function(evt) {\n            console.log('connected');\n\n            socket = evt.detail.socketWrapper;\n            elt = evt.detail.elt;\n\n            status.innerText = 'Connected to ';\n            status.setAttribute('data-status', 'connected');\n        });\n\n        document.body.addEventListener('htmx:wsClose', function(evt) {\n            console.log('disconnected');\n\n            console.warn(evt.detail)\n\n            status.innerText = 'Disconnected from ';\n            status.setAttribute('data-status', 'disconnected');\n        });\n\n    </script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></main></body></html><script type=\"text/javascript\" defer>\n        let status = document.getElementById('status');\n\n        let socket;\n        let elt;\n\n        document.body.addEventListener('htmx:wsConnecting', function (evt) {\n            console.log('connecting to server');\n            status.innerText = 'Connecting to ';\n            status.classList.remove('text-red-700')\n            status.classList.add('text-orange-700')\n            status.classList.remove('text-green-700')\n            status.setAttribute('data-status', 'connecting');\n        });\n        document.body.addEventListener('htmx:wsOpen', function(evt) {\n            console.log('connected');\n\n            socket = evt.detail.socketWrapper;\n            elt = evt.detail.elt;\n\n            status.innerText = 'Connected to ';\n            status.classList.remove('text-red-700')\n            status.classList.remove('text-orange-700')\n            status.classList.add('text-green-700')\n            status.setAttribute('data-status', 'connected');\n        });\n        document.body.addEventListener('htmx:wsClose', function(evt) {\n            console.log('disconnected');\n            console.warn(evt.detail)\n\n            status.innerText = 'Disconnected from ';\n            status.classList.add('text-red-700')\n            status.classList.remove('text-orange-700')\n            status.classList.remove('text-green-700')\n            status.setAttribute('data-status', 'disconnected');\n        });\n\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

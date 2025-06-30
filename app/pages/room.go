@@ -14,14 +14,8 @@ import (
 
 func RoomCreate() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var notifications = make([]models.Notification, 0)
-		rawNotification, hasNotification := c.Get("notification")
-		if hasNotification {
-			notification := rawNotification.(models.Notification)
-			notifications = append(notifications, notification)
-		}
 
-		err := render(c, http.StatusOK, views.RoomCreate(notifications))
+		err := render(c, http.StatusOK, views.RoomCreate(getNotifications(c), models.CreateOrJoinRoomValues{}))
 		if err != nil {
 			return
 		}
@@ -30,7 +24,7 @@ func RoomCreate() gin.HandlerFunc {
 
 func RoomCreatePost() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		notifications := make([]models.Notification, 0)
+		notifications := getNotifications(c)
 		user := c.MustGet("user").(models.User)
 		room := models.NewRoom()
 
@@ -44,6 +38,7 @@ func RoomCreatePost() gin.HandlerFunc {
 
 		// Validate Request
 		var createRoomReq createRoomRequest
+		createRoomValues := models.CreateOrJoinRoomValues{}
 		err := c.Bind(&createRoomReq)
 		if err == nil {
 			// - Check required fields
@@ -53,6 +48,8 @@ func RoomCreatePost() gin.HandlerFunc {
 			} else {
 				user.Name = html.EscapeString(createRoomReq.DisplayName)
 				room.Name = html.EscapeString(createRoomReq.RoomName)
+				createRoomValues.RoomName = room.Name
+				createRoomValues.UserName = user.Name
 			}
 			// Check passwords
 			room.Private = false
@@ -86,7 +83,7 @@ func RoomCreatePost() gin.HandlerFunc {
 		}
 
 		if len(notifications) > 0 {
-			renderErr := render(c, http.StatusOK, views.RoomCreate(notifications))
+			renderErr := render(c, http.StatusOK, views.RoomCreate(notifications, createRoomValues))
 			if renderErr != nil {
 				log.Println(renderErr)
 			}
@@ -107,20 +104,20 @@ type createRoomRequest struct {
 
 func RoomJoin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		notifications := make([]models.Notification, 0)
+		notifications := getNotifications(c)
 		rawRoom, hasRoom := c.Get("room")
 		rawUser, hasUser := c.Get("user")
 
 		// Only Check for room; allow a user to change its display name
 		if !hasRoom {
 			c.Set("notification", models.NewNotification(models.Error, "404 - Room does not exist"))
-			c.Redirect(http.StatusFound, "/")
+			c.Redirect(http.StatusFound, "/?notification='404 - Room does not exist'")
 			return
 		}
 		room := rawRoom.(models.Room)
 		if !session.IsRoomSessionRunning(room.Id) {
 			c.Set("notification", models.NewNotification(models.Error, "404 - Room is currently not running"))
-			c.Redirect(http.StatusFound, "/")
+			c.Redirect(http.StatusFound, "/?notification='404 - Room is currently not running'")
 			return
 		}
 
@@ -141,7 +138,7 @@ func RoomJoin() gin.HandlerFunc {
 
 func RoomJoinPost() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		notifications := make([]models.Notification, 0)
+		notifications := getNotifications(c)
 		room := c.MustGet("room").(models.Room)
 		user := c.MustGet("user").(models.User)
 
@@ -162,7 +159,7 @@ func RoomJoinPost() gin.HandlerFunc {
 			missingDataErr := models.NewNotification(models.Error, "Missing Required User Display name")
 			notifications = append(notifications, missingDataErr)
 		} else {
-			user.Name = joinRoomReq.DisplayName
+			user.Name = html.EscapeString(joinRoomReq.DisplayName)
 		}
 
 		// Try Authentication (if needed)
@@ -196,7 +193,7 @@ type joinRoomRequest struct {
 
 func RoomSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		notifications := make([]models.Notification, 0)
+		notifications := getNotifications(c)
 		user := c.MustGet("user").(models.User)
 		room := c.MustGet("room").(models.Room)
 
@@ -208,7 +205,7 @@ func RoomSession() gin.HandlerFunc {
 
 		// Test if user is Authenticated
 		if !session.IsUserIdAuthenticatedInRoomSession(user.Id, room.Id) {
-			c.Set("notification", models.NewNotification(models.Error, "401 - Not Authenticated"))
+			c.Set("notification", models.NewNotification(models.Error, "401 - Unauthorized"))
 			c.Redirect(http.StatusFound, "/room/join/"+room.Id)
 			return
 		}

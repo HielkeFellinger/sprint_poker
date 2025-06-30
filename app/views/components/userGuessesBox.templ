@@ -7,11 +7,11 @@ templ UsersGuessBox(visible bool, user models.User, userGuesses []models.UserGue
         for _, userGuess := range userGuesses {
             if userGuess.User != nil {
                 if userGuess.User.Id == user.Id {
-                    <div class="border border-zinc-200 border-2 shadow-md rounded-lg m-2 bg-white max-w-32 min-w-32 min-h-32">
-                        @UserGuess(visible, userGuess)
+                    <div class="border border-blue-500 border-2 shadow-md rounded-lg m-2 bg-blue-50 max-w-40 min-w-40 min-h-32">
+                        @UserGuess(true, userGuess)
                     </div>
                 } else {
-                    <div class="m-2 bg-white max-w-32 min-w-32 min-h-32">
+                    <div class="m-2 bg-white max-w-40 min-w-40 min-h-32">
                         @UserGuess(visible, userGuess)
                     </div>
                 }
@@ -21,15 +21,16 @@ templ UsersGuessBox(visible bool, user models.User, userGuesses []models.UserGue
 }
 
 templ UserGuess(visible bool, userGuess models.UserGuess) {
-    <div class="w-full flex text-center">
-        <h4 class="w-full">{ userGuess.User.Name }</h4>
+    <div class="w-full text-center">
+        <h4 class="w-full overflow-hidden font-bold text-gray-700" title={ userGuess.User.Name }>{ userGuess.User.Name }</h4>
     </div>
-    <div class="w-full flex items-center justify-between">
+    <div class="w-full flex flex-column justify-center items-center">
         if userGuess.Card != nil {
             if visible {
                 @CardSmall(*userGuess.Card)
+            } else {
+                @CardSmallHidden()
             }
-            @CardSmallHidden()
         }
     </div>
 }

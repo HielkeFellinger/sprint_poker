@@ -15,23 +15,46 @@ func EnsureUserAndRoomValuesAreSetAndUserIsAuthenticated(c *gin.Context) {
 	// Check if Room exists; if not, redirect to home
 	roomId := c.Param("room_id")
 
-	log.Println(c.Request.RequestURI)
-	log.Printf("User ID: '%s'", user.Id)
-	log.Printf("Room ID: '%s'", roomId)
-
 	room, roomRetrievalErr := session.GetRoomRunningByRoomId(roomId)
 	if roomRetrievalErr != nil {
 		c.Set("notification", models.NewNotification(models.Error, "404 - Room does not exist"))
-		c.Redirect(http.StatusFound, "/")
+		c.Redirect(http.StatusFound, "/?notification='404 - Room does not exist'")
 		c.Abort()
 		return
 	}
 
 	// Check if user is allowed to access room; if not, ensure user joins fist
 	if !session.IsUserIdAuthenticatedInRoomSession(user.Id, room.Id) {
-		c.Set("notification", models.NewNotification(models.Error, "401 - Not Authenticated"))
+		c.Set("notification", models.NewNotification(models.Error, "401 - Unauthorized"))
 		c.Redirect(http.StatusFound, "/room/join/"+roomId)
 		c.Abort()
+		return
+	} else {
+		user.Name = session.GetUserAliasFromSessionByUserIdAndRoomId(user.Id, room.Id)
+	}
+
+	c.Set("room", room)
+	c.Set("user", user)
+	c.Next()
+}
+
+func EnsureUserAndRoomValuesAreSetAndUserIsAuthenticatedWs(c *gin.Context) {
+	user := ensureSessionCookieAndGetUpToDateUser(c)
+
+	// Check if Room exists; if not, redirect to home
+	roomId := c.Param("room_id")
+
+	room, roomRetrievalErr := session.GetRoomRunningByRoomId(roomId)
+	if roomRetrievalErr != nil {
+		c.Set("notification", models.NewNotification(models.Error, "404 - Room does not exist"))
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	// Check if user is allowed to access room; if not, ensure user joins fist
+	if !session.IsUserIdAuthenticatedInRoomSession(user.Id, room.Id) {
+		c.Set("notification", models.NewNotification(models.Error, "401 - Unauthorized"))
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	} else {
 		user.Name = session.GetUserAliasFromSessionByUserIdAndRoomId(user.Id, room.Id)
@@ -50,7 +73,7 @@ func EnsureUserAndRoomValuesAreSet(c *gin.Context) {
 	room, roomRetrievalErr := session.GetRoomRunningByRoomId(roomId)
 	if roomRetrievalErr != nil {
 		c.Set("notification", models.NewNotification(models.Error, "404 - Room does not exist"))
-		c.Redirect(http.StatusFound, "/")
+		c.Redirect(http.StatusFound, "/?notification='404 - Room does not exist'")
 		c.Abort()
 		return
 	} else {

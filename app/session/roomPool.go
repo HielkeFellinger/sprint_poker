@@ -30,9 +30,11 @@ func (pool *roomPool) Run() {
 		select {
 		case session := <-pool.Register:
 			pool.Sessions[session] = true
+			log.Printf("POOL: New Room Session: '%s'", session.Id)
 		case session := <-pool.Unregister:
 			if _, ok := pool.Sessions[session]; ok {
 				delete(pool.Sessions, session)
+				log.Printf("POOL: Removing Room Session: '%s'", session.Id)
 			}
 		}
 	}

@@ -13,7 +13,7 @@ import (
 	"hielkefellinger.nl/sprint_poker/app/views/components"
 )
 
-func RoomCreate(notifications []models.Notification) templ.Component {
+func RoomCreate(notifications []models.Notification, possibleInput models.CreateOrJoinRoomValues) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -42,7 +42,33 @@ func RoomCreate(notifications []models.Notification) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<body><main class=\"min-h-screen w-full\"><nav class=\"flex w-full items-center justify-between border border-b-zinc-200 px-4 py-4\"><h3 onclick=\"window.location = '/';\" class=\"cursor-pointer text-base lg:text-lg font-medium text-gray-700 text-center\">Sprint Poker</h3></nav><div class=\"mt-6 w-full flex justify-center items-center flex-col\"><section class=\"mt-6 px-4 py-4 w-96 bg-blue-50 rounded-lg\"><form method=\"post\" action=\"/room/create\"><label for=\"displayName\" class=\"text-gray-700 ml-1\">Your Display Name: </label> <input type=\"text\" id=\"displayName\" name=\"displayName\" class=\"w-full border rounded-lg p-2 mt-2\" placeholder=\"Your Display Name\" required><hr class=\"mt-4 mb-2\"><label for=\"roomName\" class=\"text-gray-700 ml-1\">Room Name: </label> <input type=\"text\" id=\"roomName\" name=\"roomName\" class=\"w-full border rounded-lg p-2 mt-2 mb-2\" placeholder=\"Room Name\" required> <label for=\"password\" class=\"text-gray-700 ml-1\">Room Password (Optional): </label> <input type=\"password\" id=\"password\" name=\"password\" class=\"w-full border rounded-lg p-2 mt-2 mb-2\" placeholder=\"Room Password\"> <label for=\"passwordCheck\" class=\"text-gray-700 ml-1\">Confirm Room Password (Optional): </label> <input type=\"password\" id=\"passwordCheck\" name=\"passwordCheck\" class=\"w-full border rounded-lg p-2 mt-2 mb-2\" placeholder=\"Confirm Room Password\"> <button class=\"mt-2 w-full px-2 h-10 rounded-lg text-white bg-blue-500\">CREATE </button></form></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<body><main class=\"min-h-screen w-full\"><nav class=\"flex w-full items-center justify-between border border-b-zinc-200 px-4 py-4\"><h3 onclick=\"window.location = '/';\" class=\"cursor-pointer text-base lg:text-lg font-medium text-gray-700 text-center\">Sprint Poker</h3></nav><div class=\"mt-6 w-full flex justify-center items-center flex-col\"><section class=\"mt-6 px-4 py-4 w-96 bg-blue-50 rounded-lg\"><form method=\"post\" action=\"/room/create\"><label for=\"displayName\" class=\"text-gray-700 ml-1\">Your Display Name: </label> <input type=\"text\" id=\"displayName\" name=\"displayName\" class=\"w-full border rounded-lg p-2 mt-2\" placeholder=\"Your Display Name\" required value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(possibleInput.UserName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/views/roomCreate.templ`, Line: 24, Col: 98}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><hr class=\"mt-4 mb-2\"><label for=\"roomName\" class=\"text-gray-700 ml-1\">Room Name: </label> <input type=\"text\" id=\"roomName\" name=\"roomName\" class=\"w-full border rounded-lg p-2 mt-2 mb-2\" placeholder=\"Room Name\" required value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(possibleInput.RoomName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/views/roomCreate.templ`, Line: 28, Col: 90}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"> <label for=\"password\" class=\"text-gray-700 ml-1\">Room Password (Optional): </label> <input type=\"password\" id=\"password\" name=\"password\" class=\"w-full border rounded-lg p-2 mt-2 mb-2\" placeholder=\"Room Password\"> <label for=\"passwordCheck\" class=\"text-gray-700 ml-1\">Confirm Room Password (Optional): </label> <input type=\"password\" id=\"passwordCheck\" name=\"passwordCheck\" class=\"w-full border rounded-lg p-2 mt-2 mb-2\" placeholder=\"Confirm Room Password\"> <button class=\"mt-2 w-full px-2 h-10 rounded-lg text-white bg-blue-500\">CREATE </button></form></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -52,7 +78,7 @@ func RoomCreate(notifications []models.Notification) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></main></body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></main></body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -60,7 +86,7 @@ func RoomCreate(notifications []models.Notification) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</html><script>\n        // ...\n    </script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</html><script>\n        // ...\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
