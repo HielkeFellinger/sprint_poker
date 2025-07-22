@@ -9,9 +9,9 @@ templ Card(card models.Card, room models.Room) {
     <div class="border border-zinc-200 border-2 shadow-md rounded-lg m-2 bg-white hover:bg-zinc-200 max-w-24 cursor-pointer"
         title={ "Card: " + card.Value } id={ "card_" + card.Id } hx-vals='{"type": "guess"}' hx-target="#userGuessBox" ws-send >
         <div class="w-full flex items-center justify-between">
-            <div class="size-9 flex items-center justify-center">♥️</div>
-            <div class="size-9"> </div>
-            <div class="size-9 flex items-center justify-center">♥️</div>
+            <div class="size-10 flex items-center justify-center">♥️</div>
+            <div class="size-10"> </div>
+            <div class="size-10 flex items-center justify-center">♥️</div>
         </div>
         <div class="w-full flex justify-center items-center flex-grow">
             <div class="text-3xl font-bold">{ card.Value }</div>
